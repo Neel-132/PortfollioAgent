@@ -55,6 +55,9 @@ The system integrates structured portfolio data, live market APIs, and unstructu
 
 ## How to run?
 In dummy.env file present inside backend, put your GEMINI API KEY and rename it to .env and you're good to go
+
+
+## Set up
 pip install uv
 uv sync
 streamlit run ui/app.py
