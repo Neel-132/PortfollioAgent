@@ -1,0 +1,143 @@
+{
+  "results": [
+    {
+      "query": "What is my return on Tesla?",
+      "intent": "portfolio",
+      "entities": [
+        "TSLA"
+      ],
+      "expected_functions": [
+        "get_returns"
+      ],
+      "predicted_functions": [
+        "get_returns"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "intent": "portfolio",
+      "entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "expected_functions": [
+        "compare_performance"
+      ],
+      "predicted_functions": [
+        "compare_performance"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Show my portfolio allocation by sector",
+      "intent": "portfolio",
+      "entities": [],
+      "expected_functions": [
+        "get_allocation"
+      ],
+      "predicted_functions": [
+        "get_allocation"
+      ],
+      "pass": true
+    },
+    {
+      "query": "What are my best performing stocks?",
+      "intent": "portfolio",
+      "entities": [],
+      "expected_functions": [
+        "get_best_performers"
+      ],
+      "predicted_functions": [
+        "get_best_performers"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Which stocks do I own?",
+      "intent": "portfolio",
+      "entities": [],
+      "expected_functions": [
+        "get_holdings"
+      ],
+      "predicted_functions": [
+        "get_holdings"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Does Apple's earnings affect my portfolio?",
+      "intent": "hybrid",
+      "entities": [
+        "AAPL"
+      ],
+      "expected_functions": [
+        "get_returns"
+      ],
+      "predicted_functions": [
+        "get_weight_in_portfolio"
+      ],
+      "pass": false
+    },
+    {
+      "query": "How are they performing?",
+      "intent": "portfolio",
+      "entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "expected_functions": [
+        "compare_performance"
+      ],
+      "predicted_functions": [
+        "compare_performance"
+      ],
+      "pass": true
+    },
+    {
+      "query": "What is the total value of my portfolio?",
+      "intent": "portfolio",
+      "entities": [],
+      "expected_functions": [
+        "get_portfolio_value"
+      ],
+      "predicted_functions": [],
+      "pass": false
+    },
+    {
+      "query": "Show me Amazon's performance",
+      "intent": "portfolio",
+      "entities": [
+        "AMZN"
+      ],
+      "expected_functions": [
+        "get_returns"
+      ],
+      "predicted_functions": [
+        "get_returns"
+      ],
+      "pass": true
+    },
+    {
+      "query": "How will Apple and Tesla earnings impact my holdings?",
+      "intent": "hybrid",
+      "entities": [
+        "AAPL",
+        "TSLA"
+      ],
+      "expected_functions": [
+        "compare_performance",
+        "get_returns"
+      ],
+      "predicted_functions": [
+        "get_holdings"
+      ],
+      "pass": false
+    }
+  ],
+  "metrics": {
+    "total_cases": 10,
+    "function_call_accuracy": 70.0,
+    "fallback_usage_rate": 0.0
+  }
+}

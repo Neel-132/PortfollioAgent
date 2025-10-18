@@ -1,0 +1,53 @@
+{
+  "results": [
+    {
+      "query": "What are my holdings?",
+      "expected_result": "pass",
+      "actual_result": "pass",
+      "expected_failed_agent": null,
+      "actual_failed_agent": null,
+      "reason": null,
+      "pass": true
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PlannerAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as 'portfolio'. The query 'Compare Tesla and Microsoft' refers to market intelligence, not personal portfolio holdings.",
+      "pass": false
+    },
+    {
+      "query": "Show me Amazon's performance",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PortfolioAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as portfolio instead of market",
+      "pass": false
+    },
+    {
+      "query": "What's the market sentiment today?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Did not plan a function call to MarketAgent to fetch market sentiment data.",
+      "pass": false
+    },
+    {
+      "query": "How are they performing?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Entities 'TSLA' and 'MSFT' were inferred, not extracted from the ambiguous original query 'How are they performing?'",
+      "pass": false
+    }
+  ],
+  "metrics": {
+    "total_cases": 5,
+    "accuracy": 20.0
+  }
+}

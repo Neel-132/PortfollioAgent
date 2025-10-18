@@ -1,0 +1,190 @@
+AI Investment Assistant Documentation
+Author: Neelabha Banerjee
+Date: October 17, 2025
+
+1. Overview & Objectives
+1.1 Problem Statement
+XYZ Capital is an investment management firm that manages portfolios for multiple clients. Analysts and relationship managers regularly need to answer complex portfolio-related and market-impact questions from clients in natural language.
+While structured data (portfolio holdings) and unstructured market data (news, filings) are available, analysts currently have to manually query multiple systems, which:
+●	Increases response latency
+●	Makes context tracking difficult
+●	Limits personalisation and reasoning across portfolio + market signals
+The firm wants to build an AI-based assistant capable of understanding natural language queries and generating relevant, factual, and explainable answers — while handling ambiguous questions through memory and reasoning.
+1.2 Objective
+To design and implement a multi-agent intelligence system that can:
+●	Understand natural language investment queries.
+●	Analyse and explain portfolio performance, holdings, and allocations.
+●	Augment answers with real-time market intelligence — news, SEC filings, price trends.
+●	Maintain conversational context and reasoning capability over multiple turns.
+●	Validate responses for correctness before returning them to the user.
+1.3 Scope
+The system supports:
+●	Portfolio-related queries (e.g., “What are my holdings?”, “How is MSFT performing?”)
+●	Market-related queries (e.g., “What’s the latest news on Tesla?”)
+●	Hybrid queries involving both (e.g., “Will Apple earnings affect my portfolio?”)
+●	Contextual follow-ups (e.g., “And what about the second stock?”, “Compare them”)
+●	Automatic detection and fallback for errors.
+
+
+The system does not provide:
+●	Personalised financial advice or recommendations.
+●	Order execution or trading functionality.
+●	Long-term forecasting.
+
+1.4 Design Goals
+Goal	Description
+Natural Query Understanding	Robust classification of portfolio, market, and hybrid queries, including ambiguous follow-ups.
+Multi-Agent Orchestration	Dedicated specialised agents working collaboratively within LangGraph.
+Reliable Data Integration	Integration with market APIs and internal portfolio data.
+Reasoning Capability	Use of conversation memory and structured data for intelligent answers.
+Validation & Safety	Built-in ValidatorAgent ensures response accuracy and consistency.
+Scalability	Session isolation and architecture are ready for multi-client, concurrent usage.
+1.5 Target Users & Use Cases
+User	Use Case
+Relationship Manager	“What is my client’s top-performing stock this month?”
+Analyst	“Is there any significant market event affecting our portfolio?”
+Client	“Show me my holdings and their returns.”
+Advisor	“Compare Tesla and Microsoft performance and show allocation impact.”
+
+1.6 Key Features
+●	End-to-end multi-agent orchestration using LangGraph
+●	LLM + Rule-based hybrid architecture for robust classification and planning
+●	Portfolio + Market data fusion for hybrid reasoning
+●	Session memory for context retention
+●	Output validation to minimise hallucinations and ensure correctness
+●	Streamlit UI for user interaction
+2. High-Level System Architecture
+This section maps the objectives to a clean, modular architecture that is easy to demo now and safe to evolve later.
+Why this layout?
+●	Meets objectives: Natural language understanding, portfolio + market analysis, reasoning with memory, validation before answering.
+●	Resilient: Each node has clear fallbacks; the validator guards the final output and recurses from the exact step where the current iteration failed.
+●	Traceable: Every agentic decision is audited to ensure traceability
+2.2 Agent Graph (LangGraph)
+Execution paths (decided by the Planner based on classification):
+Hybrid: MarketAgent runs first to gather event context; PortfolioAgent then computes impact on holdings.
+Fallbacks:
+●	If LLM function calling fails in planning, rule-based mapping creates safe function calls.
+●	If an agent returns partial/empty data, the pipeline continues with conservative phrasing.
+2.3 Agent Roles & Responsibilities (at a glance)
+Agent	Core Responsibility	Key Fallbacks
+QueryClassificationAgent	Intent + entity extraction	If low confidence → LLM classifier
+PlannerAgent	Build execution plan + tool calls	If LLM tools fail → rule-based function mapping
+MarketAgent	Prices, headlines, filings	Cache-first; API on miss; partial returns allowed
+PortfolioAgent	Holdings, returns, allocation, comparisons	If functions missing → default to holdings+returns
+ResponseGeneratorAgent	Grounded, concise Markdown answer	Templated summary if LLM fails
+ValidatorAgent	Judge workflow correctness; pass/fail	Default pass if invalid JSON to avoid blocking
+2.4 Data Flow Between Agents
+Stateful flow (core structures simplified):
+1.	UI → Orchestrator: { query, client_id, session_id, session}
+2.	QueryClassificationAgent: Writes classification = {intent, entities, confidence}
+3.	PlannerAgent: Writes execution_plan = {agents[], function_calls[]}
+4.	MarketAgent (if planned): Writes market_resp = {status, results{...}}
+5.	PortfolioAgent (if planned): Writes portfolio_resp = {status, results[], portfolio_summary{...}}
+6.	ResponseGeneratorAgent: Writes final_response = {text, data:{...}}
+7.	ValidatorAgent: Writes {validation_result, failed_agent?, reason?}
+3.7 Knowledge Base & Retrieval Layer
+
+Purpose:
+While structured market and portfolio data answer many factual questions, a large amount of financial intelligence lives in unstructured text such as SEC filings, press releases, earnings call summaries, and news reports. The Knowledge Base (KB) layer allows the system to retrieve and use these sources for context-rich, explainable responses.
+
+Architecture:
+- A background ingestion pipeline collects filings, news, and announcements.
+- Text is cleaned, chunked, and embedded using vector embeddings.
+- Chunks are stored in a Vector Database with metadata like ticker, date, and source.
+- MarketAgent and ResponseGenerator retrieve top relevant snippets based on tickers and query semantics.
+
+Integration Points:
+- MarketAgent: enriches structured price/news response with deeper insights from filings.
+- ResponseGeneratorAgent: uses retrieved snippets for richer, grounded reasoning.
+- ValidatorAgent: cross-checks final responses against retrieved context for grounding.
+
+Fallbacks:
+- If retrieval fails or no data is found, the system gracefully falls back to structured market data.
+- If the vector DB is down, MarketAgent bypasses KB retrieval entirely.
+
+Benefits:
+- Enables true retrieval-augmented generation (RAG).
+- Improves hybrid portfolio + market reasoning.
+- Reduces hallucination by anchoring answers in real text.
+
+8.	Orchestrator → UI: Returns final_response; memory manager updates session
+2.5 State Shape (canonical)
+{
+  "query": "...",
+  "client_id": "CLT-001",
+  "session_id": "sess-...",
+  "session": {
+    "chat_history": [ { "user": {...}, "system": {...} } ],
+    "symbol_name_map": { "TSLA": ["tesla", "tesla inc"], ... },
+    "portfolio": { "CLT-001": [ ... ] },
+    "price_cache": { "TSLA": 245.6, ... }
+  },
+  "classification": { "intent": "...", "entities": ["..."] },
+  "execution_plan": { "agents": ["..."], "function_calls": [ ... ] },
+  "market_resp": { ... },
+  "portfolio_resp": { ... },
+  "final_response": { "text": "...", "data": {...} },
+  "workflow_log": { "agents_executed": [...], "steps": [ ... ] }
+}
+
+3. Agent Components
+This section details each agent’s purpose, inputs/outputs, core logic, fallbacks, and memory usage.
+3.1 QueryClassificationAgent
+●	Purpose: Understand the user’s intent and extract normalised entities.
+●	Responsibilities: Classify intent, extract entities, normalise to tickers, and use history to resolve pronouns.
+●	Core Logic: Rule-based pass with keyword/regex matching, then history-based disambiguation.
+●	Fallbacks: If confidence is low, uses an LLM classifier. Returns "unknown" if LLM fails.
+3.2 PlannerAgent
+●	Purpose: Convert classification into an execution plan.
+●	Responsibilities: Decide which agents to run and prepare portfolio function calls.
+●	Core Logic: Uses LLM tool-calling for function selection.
+●	Fallbacks: If LLM fails, uses deterministic mapping (e.g., "compare" → compare_performance).
+3.3 MarketAgent
+●	Purpose: Fetch market intelligence for entities.
+●	Responsibilities: Retrieve prices, headlines, and filings.
+●	Core Logic: Cache-first, then API on miss.
+●	Fallbacks: Returns partial results on API errors.
+3.4 PortfolioAgent
+●	Purpose: Answer portfolio questions using deterministic calculators.
+●	Responsibilities: Run computations for holdings, performance, allocations, etc.
+●	Core Logic: Executes function calls from the plan.
+●	Fallbacks: Defaults to holdings+returns if function-calling fails.
+3.5 ResponseGeneratorAgent
+●	Purpose: Produce a concise, markdown response grounded in agent outputs.
+●	Responsibilities: Summarise data; reason about relationships in hybrid queries.
+●	Core Logic: Uses an LLM to generate a natural language summary.
+●	Fallbacks: Uses templated summaries if the LLM fails.
+
+3.6 ValidatorAgent
+●	Purpose: Act as a strict critic over the entire workflow.
+●	Responsibilities: Evaluate the workflow log to detect errors.
+●	Core Logic: An LLM runs a validator prompt with the full workflow context.
+●	Fallbacks: Defaults to a "pass" result if the validator fails.
+4. Production Go-To Plan
+This plan describes how to take the prototype to a secure, observable, scalable production system.
+4.1 Production Architecture
+A multi-tiered architecture with a Web UI (Streamlit/Next.js), API Gateway, a FastAPI backend, an LLM Gateway, and a worker pool for async tasks. Data is stored across PostgreSQL, Redis, an Object Store, and a Vector DB.
+4.2 Scalability & Performance
+The system handles concurrency via synchronous paths for quick queries and async tasks for heavy data pulls. An aggressive multi-layer caching strategy (Redis, client-side) improves latency.
+4.3 Reliability & Resilience
+Timeouts and retries are configured for all external calls. The system has defined degradation modes, like falling back to rule-based logic if an LLM fails. High availability is ensured through multiple replicas and multi-AZ deployments.
+4.4 Security & Privacy
+Authentication is handled via OIDC, with strict tenant isolation. Data minimization principles are applied, and secrets are managed through a KMS.
+4.5 Observability
+Metrics, logs, and traces are collected for monitoring business, quality, latency, cost, and infrastructure. Alerts are configured for SLO breaches.
+4.6 CI/CD & Testing
+A robust CI/CD pipeline includes unit, contract, integration, load, and prompt regression tests. Deployments use blue/green or canary strategies.
+4.7 Data Management
+Clear schemas are defined in PostgreSQL. Data retention policies are configurable. A worker-based ingestion pipeline populates the knowledge base.
+4.8 Production Runbooks
+Pre-defined runbooks exist for common incidents like LLM provider outages, API rate limiting, or database overload.
+4.9 SLOs & Capacity Planning
+●	Availability: 99.9% for API.
+●	Latency (P95): ≤ 6s.
+●	Error Budget: ≤ 1% failed requests (excluding user errors).
+4.10 Phased Rollout
+1.	Phase 0 – Hardening: Implement core production infrastructure.
+2.	Phase 1 – Limited Beta: Enable multi-tenant sessions and monitor SLOs.
+3.	Phase 2 – General Availability: Canary rollout to all clients.
+4.	Phase 3 – Continuous Improvement: Introduce advanced features.
+.

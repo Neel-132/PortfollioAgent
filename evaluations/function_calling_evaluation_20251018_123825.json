@@ -1,0 +1,91 @@
+{
+  "results": [
+    {
+      "query": "What is my return on Tesla?",
+      "intent": "portfolio",
+      "entities": [
+        "TSLA"
+      ],
+      "expected_functions": [
+        "get_returns"
+      ],
+      "predicted_functions": [
+        "get_returns"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "intent": "portfolio",
+      "entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "expected_functions": [
+        "compare_performance"
+      ],
+      "predicted_functions": [
+        "compare_performance"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Show my portfolio allocation by sector",
+      "intent": "portfolio",
+      "entities": [],
+      "expected_functions": [
+        "get_allocation"
+      ],
+      "predicted_functions": [
+        "get_allocation"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Does Apple\u2019s earnings affect my portfolio?",
+      "intent": "hybrid",
+      "entities": [
+        "AAPL"
+      ],
+      "expected_functions": [
+        "get_returns"
+      ],
+      "predicted_functions": [
+        "get_weight_in_portfolio"
+      ],
+      "pass": false
+    },
+    {
+      "query": "What are my best performing stocks?",
+      "intent": "portfolio",
+      "entities": [],
+      "expected_functions": [
+        "get_best_performers"
+      ],
+      "predicted_functions": [
+        "get_best_performers"
+      ],
+      "pass": true
+    },
+    {
+      "query": "How are they performing?",
+      "intent": "portfolio",
+      "entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "expected_functions": [
+        "compare_performance"
+      ],
+      "predicted_functions": [
+        "compare_performance"
+      ],
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "total_cases": 6,
+    "function_call_accuracy": 83.33333333333334,
+    "fallback_usage_rate": 0.0
+  }
+}
