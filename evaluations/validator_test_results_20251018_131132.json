@@ -1,0 +1,53 @@
+{
+  "results": [
+    {
+      "query": "What are my holdings?",
+      "expected_result": "pass",
+      "actual_result": "pass",
+      "expected_failed_agent": null,
+      "actual_failed_agent": null,
+      "reason": null,
+      "pass": true
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PlannerAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as 'portfolio'; query 'Compare Tesla and Microsoft' should be classified as 'market'.",
+      "pass": true
+    },
+    {
+      "query": "Show me Amazon's performance",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PortfolioAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as portfolio instead of market. The query 'Show me Amazon's performance' asks for market intelligence about a specific company, not personal portfolio data.",
+      "pass": true
+    },
+    {
+      "query": "What's the market sentiment today?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Did not plan any function call (e.g., MarketAgent) despite 'market' intent, leading to a hallucinated response.",
+      "pass": true
+    },
+    {
+      "query": "How are they performing?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Hallucinated entities (TSLA, MSFT) not present in the original query 'How are they performing?'",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "total_cases": 5,
+    "accuracy": 100.0
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "results": [
+    {
+      "query": "What are my holdings?",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "pass": true
+    },
+    {
+      "query": "Latest news on Tesla",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [
+        "Tesla",
+        "TSLA"
+      ],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [
+        "MSFT",
+        "TSLA"
+      ],
+      "expected_entities": [
+        "MSFT",
+        "TSLA"
+      ],
+      "pass": false
+    },
+    {
+      "query": "How is it performing?",
+      "context": "Show me Tesla",
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [
+        "TSLA"
+      ],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "pass": false
+    },
+    {
+      "query": "Compare them",
+      "context": "Show me Tesla and Microsoft",
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [
+        "MSFT",
+        "TSLA"
+      ],
+      "expected_entities": [
+        "MSFT",
+        "TSLA"
+      ],
+      "pass": false
+    },
+    {
+      "query": "Does Apple's earnings affect my portfolio?",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "hybrid",
+      "predicted_entities": [
+        "AAPL",
+        "Apple"
+      ],
+      "expected_entities": [
+        "AAPL"
+      ],
+      "pass": false
+    },
+    {
+      "query": "Show me Amazon's performance",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [
+        "Amazon",
+        "AMZN"
+      ],
+      "expected_entities": [
+        "AMZN"
+      ],
+      "pass": true
+    },
+    {
+      "query": "What is the market sentiment today?",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "pass": true
+    },
+    {
+      "query": "Tell me about Google",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [
+        "GOOG"
+      ],
+      "expected_entities": [
+        "GOOG"
+      ],
+      "pass": true
+    },
+    {
+      "query": "Blah blah blah",
+      "context": null,
+      "predicted_intent": "unknown",
+      "expected_intent": "unknown",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "total_cases": 10,
+    "overall_accuracy": 60.0,
+    "intent_accuracy": 60.0,
+    "entity_accuracy": 100.0,
+    "entity_precision": 75.0,
+    "entity_recall": 100.0,
+    "context_resolution_accuracy": 0.0,
+    "unknown_detection_accuracy": 100.0
+  }
+}

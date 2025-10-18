@@ -1,0 +1,20 @@
+[project]
+name = "portfolio-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "crawl4ai>=0.7.4",
+    "dotenv>=0.9.9",
+    "google>=3.0.0",
+    "google-genai>=1.44.0",
+    "langgraph>=0.6.10",
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
+    "pip>=25.2",
+    "plotly>=6.3.1",
+    "spacy>=3.8.7",
+    "streamlit>=1.50.0",
+    "yfinance>=0.2.66",
+]
