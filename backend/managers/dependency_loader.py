@@ -21,6 +21,7 @@ class DependencyLoader:
         Loads portfolio & keywords for the given client and stores in session.
         """
         # 1. Filter portfolio for the client
+        self.df['Purchase Price'] = self.df['Purchase Price'].apply(lambda x: round(x, 2))
         client_portfolio = self.df[self.df["client_id"] == client_id]
         if client_portfolio.empty:
             raise ValueError(f"No portfolio found for client_id {client_id}")

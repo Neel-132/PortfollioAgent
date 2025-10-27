@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Any
 import re
 import spacy
 import backend.constant as constant
+import traceback
 _nlp = spacy.load("en_core_web_lg")
 logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
 logger = logging.getLogger()
@@ -223,13 +224,17 @@ def normalize_entities(
 
 def escape_markdown(text):
     """Escape special markdown characters to display as literal text"""
-    # Characters that need escaping in markdown
-    special_chars = ['\\', '`', '*', '_', '{', '}', '[', ']', '(', ')', '#', '+', '-', '.', '!', '$']
-    
-    for char in special_chars:
-        text = text.replace(char, '\\' + char)
-    
-    return text
+    try:
+        # Characters that need escaping in markdown
+        special_chars = ['\\', '`', '*', '_', '{', '}', '[', ']', '(', ')', '#', '+', '-', '.', '!', '$']
+        
+        for char in special_chars:
+            text = text.replace(char, '\\' + char)
+        
+        return text
+    except Exception as e:
+        logger.error(f"Error in escape_markdown: {str(e)}")
+        return text
 
 def escape_dollar_signs(text):
     """Escape dollar signs for Streamlit markdown rendering while preserving markdown syntax"""
@@ -335,3 +340,121 @@ def get_workflow_log(state: Dict) -> Dict:
     """
     return state.get("workflow_log", {})
 
+def normalize_holdings(data):
+    """Handle holdings/positions output with support for list or detailed dicts."""
+    try:
+        holdings = data.get("get_holdings", [])
+        if not holdings:
+            return {"type": "holdings_empty", "data": []}
+
+        # Case 1: Simple list of symbols
+        if all(isinstance(item, str) for item in holdings):
+            return {"type": "holdings_list", "data": holdings}
+
+        # Case 2: Detailed holdings
+        if all(isinstance(item, dict) for item in holdings):
+            return {"type": "holdings_detailed", "data": holdings}
+
+        # Mixed or unrecognized structure
+        return {"type": "holdings_unknown", "data": holdings}
+
+    except Exception as e:
+        return {"type": "error", "error": f"Holdings parsing failed: {e}"}
+    
+def normalize_best_performers(data):
+    """Normalize best performers output."""
+    try:
+        performers = data.get("get_best_performers", {}).get("best_performers", [])
+        return {"type": "best_performers", "data": performers}
+    except Exception as e:
+        return {"type": "error", "error": f"Best performers parsing failed: {e}"}
+    
+def normalize_worst_performers(data):
+    """Normalize worst performers output."""
+    try:
+        performers = data.get("get_worst_performers", {}).get("worst_performers", [])
+        return {"type": "worst_performers", "data": performers}
+    except Exception as e:
+        return {"type": "error", "error": f"Worst performers parsing failed: {e}"}
+    
+def normalize_market_cap_allocation(data):
+    """Normalize market cap allocation output."""
+    try:
+        alloc = data.get("get_market_cap_allocation", {}).get("market_cap_allocations", {})
+        # Flatten to just category → percent for pie chart
+        processed = {cap: details.get("allocation_percent", 0) for cap, details in alloc.items()}
+        return {"type": "market_cap_allocation", "data": {"allocations": processed, "raw": alloc}}
+    except Exception as e:
+        return {"type": "error", "error": f"Market cap allocation parsing failed: {e}"}
+
+
+
+def normalize_portfolio_output(raw_data):
+    """
+    Normalize portfolio API/model outputs into a consistent structure.
+    Returns a dict with keys:
+        - type: one of [allocation, returns, unknown, error]
+        - data: normalized data structure for visualization
+        - raw: original data (for debugging)
+        - error: error message (if any)
+    """
+
+    def normalize_allocation(data):
+        """Handle sector allocation output"""
+        try:
+            alloc = data.get("get_allocation", {}).get("sector_allocations", {})
+            return {"type": "allocation", "data": alloc}
+        except Exception as e:
+            return {"type": "error", "error": f"Allocation parsing failed: {e}"}
+
+    def normalize_returns(data):
+        """Handle instrument-level return output"""
+        try:
+            returns = data.get("get_returns", {}).get("returns", [])
+            return {"type": "returns", "data": returns}
+        except Exception as e:
+            return {"type": "error", "error": f"Returns parsing failed: {e}"}
+        
+
+    # Registry of supported normalizers
+    normalizers = {
+        "get_allocation": normalize_allocation,
+        "get_returns": normalize_returns,
+        # Future additions:
+        "get_holdings": normalize_holdings,
+        "get_best_performers": normalize_best_performers,
+        "get_worst_performers": normalize_worst_performers,
+        "get_market_cap_allocation": normalize_market_cap_allocation
+        # "get_performance": normalize_performance,
+    }
+
+    # Base response template
+    response = {
+        "type": "unknown",
+        "data": None,
+        "raw": raw_data,
+        "error": None,
+    }
+
+    try:
+        if not raw_data or not isinstance(raw_data, dict):
+            response["type"] = "error"
+            response["error"] = "Invalid or empty response."
+            return response
+
+        for key, func in normalizers.items():
+            if key in raw_data:
+                result = func(raw_data)
+                response.update(result)
+                return response
+
+        # If no known key matched
+        response["type"] = "unknown"
+        response["data"] = raw_data
+        return response
+
+    except Exception as e:
+        response["type"] = "error"
+        response["error"] = f"Unexpected normalization error: {str(e)}"
+        response["trace"] = traceback.format_exc()
+        return response

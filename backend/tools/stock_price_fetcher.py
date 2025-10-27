@@ -37,9 +37,10 @@ def fetch_latest_prices(tickers: list[str]) -> dict[str, float]:
     prices = {}
     for t in tickers:
         try:
-            data = yf.Ticker(t).history(period="1d")
+            t_clean = t.replace('.', '-')
+            data = yf.Ticker(t_clean).history(period="1d")
             if not data.empty:
-                prices[t] = float(data["Close"].iloc[-1])
+                prices[t] = round(float(data["Close"].iloc[-1]), 2)
             else:
                 logger.warning(f"No price data found for {t}")
                 prices[t] = 0.0

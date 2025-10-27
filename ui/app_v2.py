@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Import your backend orchestrator
 from backend.orchestrator.main_graph import run_query
-from backend.utils.helper import escape_markdown, escape_dollar_signs
+from backend.utils.helper import escape_markdown, escape_dollar_signs, normalize_portfolio_output
 
 # ------------------------------------------------
 # Suggestion Queries
@@ -58,29 +58,238 @@ def session_sidebar(client_ids):
 # ------------------------------------------------
 # 3. Sidebar - Portfolio Overview Snapshot
 # ------------------------------------------------
-def portfolio_snapshot(portfolio_data):
-    st.sidebar.subheader("Portfolio Overview")
+# def portfolio_snapshot(portfolio_data):
+#     st.sidebar.subheader("Portfolio Overview")
 
+#     if not portfolio_data or portfolio_data.get("status") != "success":
+#         st.sidebar.write("No portfolio data loaded.")
+#         return
+
+#     results = portfolio_data.get("results", [])
+#     try:
+#         breakpoint()
+#         if results:
+#             df = pd.DataFrame(results)
+#             st.sidebar.dataframe(df)
+
+#         # sector allocation chart if available
+#         if "portfolio_summary" in portfolio_data:
+#             alloc = portfolio_data["portfolio_summary"].get("sector_allocations", {})
+#             if alloc:
+#                 alloc_df = pd.DataFrame({"Sector": list(alloc.keys()), "Allocation": list(alloc.values())})
+#                 fig = px.pie(alloc_df, names="Sector", values="Allocation")
+#                 st.sidebar.plotly_chart(fig, use_container_width=True)
+
+#     except Exception as e:
+#         st.sidebar.write("No portfolio data loaded.")
+
+
+def portfolio_snapshot(portfolio_data):
+    """
+    Renders a portfolio snapshot in the Streamlit sidebar based on the
+    normalized output from normalize_portfolio_output().
+    """
+    st.sidebar.subheader("📈 Portfolio Overview")
     if not portfolio_data or portfolio_data.get("status") != "success":
         st.sidebar.write("No portfolio data loaded.")
         return
-
     results = portfolio_data.get("results", [])
+    breakpoint()
+    normalized = normalize_portfolio_output(results)
+    data_type = normalized["type"]
+    data = normalized["data"]
+    error = normalized["error"]
+
+    # Handle errors gracefully
+    if data_type == "error" or error:
+        st.sidebar.error(f"⚠️ Unable to render portfolio snapshot.\n\n{error}")
+        if normalized.get("trace"):
+            with st.sidebar.expander("Error Traceback"):
+                st.sidebar.code(normalized["trace"])
+        return
+
+    # Handle empty or invalid response
+    if not data:
+        st.sidebar.info("No portfolio data available.")
+        return
+
     try:
-        if results:
-            df = pd.DataFrame(results)
+        # ==========================
+        # 1. Sector Allocation View
+        # ==========================
+        if data_type == "allocation":
+            alloc_df = pd.DataFrame({
+                "Sector": list(data.keys()),
+                "Allocation (%)": list(data.values())
+            })
+            if alloc_df.empty:
+                st.sidebar.info("No sector allocation data found.")
+                return
+
+            fig = px.pie(
+                alloc_df,
+                names="Sector",
+                values="Allocation (%)",
+                title="Sector Allocation",
+            )
+            st.sidebar.plotly_chart(fig, use_container_width=True)
+
+        # ==========================
+        # 2. Instrument Returns View
+        # ==========================
+        elif data_type == "returns":
+            df = pd.DataFrame(data)
+            if df.empty:
+                st.sidebar.info("No returns data found.")
+                return
+
+            st.sidebar.markdown("### 📊 Instrument Returns")
             st.sidebar.dataframe(df)
 
-        # sector allocation chart if available
-        if "portfolio_summary" in portfolio_data:
-            alloc = portfolio_data["portfolio_summary"].get("sector_allocations", {})
-            if alloc:
-                alloc_df = pd.DataFrame({"Sector": list(alloc.keys()), "Allocation": list(alloc.values())})
-                fig = px.pie(alloc_df, names="Sector", values="Allocation")
+            # Bar chart for % return
+            if "symbol" in df.columns and "pct_return" in df.columns:
+                fig = px.bar(
+                    df.sort_values("pct_return", ascending=False),
+                    x="symbol",
+                    y="pct_return",
+                    text="pct_return",
+                    title="Returns by Instrument (%)",
+                )
+                fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+                fig.update_layout(xaxis_title="Instrument", yaxis_title="% Return")
                 st.sidebar.plotly_chart(fig, use_container_width=True)
 
+        elif data_type == "holdings_list":
+            st.sidebar.markdown("### 📦 Holdings (Symbols)")
+            if not data:
+                st.sidebar.info("No holdings available.")
+            else:
+                for symbol in data:
+                    st.sidebar.write(f"- {symbol}")
+
+        elif data_type == "holdings_detailed":
+            st.sidebar.markdown("### 🏦 Detailed Holdings")
+            df = pd.DataFrame(data)
+
+            # Handle Timestamps safely
+            for col in df.columns:
+                if pd.api.types.is_datetime64_any_dtype(df[col]) or df[col].apply(lambda x: hasattr(x, 'isoformat')).any():
+                    df[col] = df[col].astype(str)
+
+            st.sidebar.dataframe(df)
+
+            # Optional: visualize top holdings by quantity or value if available
+            if "symbol" in df.columns and "quantity" in df.columns:
+                top_holdings = df.sort_values("quantity", ascending=False)
+                fig = px.bar(
+                    top_holdings,
+                    x="symbol",
+                    y="quantity",
+                    title="Top Holdings by Quantity",
+                    text="quantity"
+                )
+                fig.update_traces(texttemplate='%{text}', textposition='outside')
+                fig.update_layout(xaxis_title="Symbol", yaxis_title="Quantity")
+                st.sidebar.plotly_chart(fig, use_container_width=True)
+
+        elif data_type == "holdings_unknown":
+            st.sidebar.warning("⚠️ Unrecognized holdings structure.")
+            with st.sidebar.expander("Raw Data"):
+                st.sidebar.json(data)
+        elif data_type == "best_performers":
+            st.sidebar.markdown("### 🏆 Best Performers")
+            df = pd.DataFrame(data)
+
+            if df.empty:
+                st.sidebar.info("No best performer data found.")
+            else:
+                # Convert timestamps to string
+                for col in df.columns:
+                    if pd.api.types.is_datetime64_any_dtype(df[col]) or df[col].apply(lambda x: hasattr(x, 'isoformat')).any():
+                        df[col] = df[col].astype(str)
+
+                # Display full table
+                st.sidebar.dataframe(df)
+
+                # Optional bar chart by pct_return
+                if "symbol" in df.columns and "pct_return" in df.columns:
+                    df_sorted = df.sort_values("pct_return", ascending=False)
+                    fig = px.bar(
+                        df_sorted,
+                        x="symbol",
+                        y="pct_return",
+                        text="pct_return",
+                        title="Top Performers by % Return"
+                    )
+                    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+                    fig.update_layout(xaxis_title="Symbol", yaxis_title="Return (%)")
+                    st.sidebar.plotly_chart(fig, use_container_width=True)
+
+        elif data_type == "worst_performers":
+            st.sidebar.markdown("### 📉 Worst Performers")
+            df = pd.DataFrame(data)
+
+            if df.empty:
+                st.sidebar.info("No worst performer data found.")
+            else:
+                # Convert timestamps safely
+                for col in df.columns:
+                    if pd.api.types.is_datetime64_any_dtype(df[col]) or df[col].apply(lambda x: hasattr(x, 'isoformat')).any():
+                        df[col] = df[col].astype(str)
+
+                st.sidebar.dataframe(df)
+
+                # Bar chart sorted ascending
+                if "symbol" in df.columns and "pct_return" in df.columns:
+                    df_sorted = df.sort_values("pct_return", ascending=True)
+                    fig = px.bar(
+                        df_sorted,
+                        x="symbol",
+                        y="pct_return",
+                        text="pct_return",
+                        title="Worst Performers by % Return"
+                    )
+                    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+                    fig.update_layout(xaxis_title="Symbol", yaxis_title="Return (%)")
+                    st.sidebar.plotly_chart(fig, use_container_width=True)
+
+        elif data_type == "market_cap_allocation":
+            st.sidebar.markdown("### 🏦 Market Cap Allocation")
+            allocations = data.get("allocations", {})
+            raw = data.get("raw", {})
+
+            if not allocations:
+                st.sidebar.info("No market cap allocation data found.")
+            else:
+                alloc_df = pd.DataFrame({
+                    "Market Cap Category": list(allocations.keys()),
+                    "Allocation (%)": list(allocations.values())
+                })
+                fig = px.pie(
+                    alloc_df,
+                    names="Market Cap Category",
+                    values="Allocation (%)",
+                    title="Portfolio by Market Cap"
+                )
+                st.sidebar.plotly_chart(fig, use_container_width=True)
+
+                # Optional: Show symbols under each category
+                with st.sidebar.expander("View Symbols by Category"):
+                    for cap, details in raw.items():
+                        symbols = details.get("symbols", [])
+                        if symbols:
+                            st.sidebar.write(f"**{cap}**: {', '.join(symbols)}")
+
+
+        ## Unknown
+        else:
+            st.sidebar.warning(f"⚠️ Unrecognized data type: `{data_type}`")
+            # with st.sidebar.expander("Raw Data"):
+            #     st.sidebar.json(data)
+
     except Exception as e:
-        st.sidebar.write("No portfolio data loaded.")
+        st.sidebar.error(f"Unexpected rendering error: {e}")
+
         
 # ------------------------------------------------
 # 4. Sidebar - Market Intelligence Snapshot
