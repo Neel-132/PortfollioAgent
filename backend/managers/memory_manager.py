@@ -28,7 +28,7 @@ class MemoryManager:
             "debug_data": debug_data
         }
         session.setdefault("chat_history", [])
-        
+        session["chat_history"].append(conversion_dict)
         session["chat_history"] = truncate_list(session["chat_history"], max_context)
 
         logger.info(f"Memory updated for backend session: {session.get('session_id', 'unknown')}")

@@ -15,7 +15,9 @@ with open(PROMPTS_PATH, "r", encoding="utf-8") as f:
 
 finhub_news_endpoint = "https://finnhub.io/api/v1/company-news"
 
+embedding_model_name = "BAAI/bge-small-en-v1.5"
 
+top_k_chunks_to_retrieve = 5
 
 query_classification_prompt = PROMPTS["query_classification"]
 

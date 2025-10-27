@@ -58,6 +58,6 @@ In dummy.env file present inside backend, put your GEMINI API KEY and rename it 
 
 
 ## Set up
-pip install uv
-uv sync
-streamlit run ui/app.py
+- pip install uv
+- uv sync
+- streamlit run ui/app.py

@@ -1,0 +1,364 @@
+{
+  "results": [
+    {
+      "query": "What are my holdings?",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "confidence": 0.0
+      }
+    },
+    {
+      "query": "Latest news on Tesla",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "TSLA",
+          "Tesla"
+        ],
+        "confidence": 0.85
+      }
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "expected_entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "intent_match": false,
+      "entity_match": true,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": {
+          "stocks": [
+            {
+              "ticker": "TSLA",
+              "raw_mention": "Tesla",
+              "normalization_source": "symbol_map",
+              "confidence": "high",
+              "context_derived": false
+            },
+            {
+              "ticker": "MSFT",
+              "raw_mention": "Microsoft",
+              "normalization_source": "symbol_map",
+              "confidence": "high",
+              "context_derived": false
+            }
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "confidence": 0.0
+      }
+    },
+    {
+      "query": "How is it performing?",
+      "context": "Show me Tesla",
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "intent_match": false,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "performance"
+          ],
+          "sectors": [],
+          "other": []
+        },
+        "confidence": 0.0
+      }
+    },
+    {
+      "query": "Compare them",
+      "context": "Show me Tesla and Microsoft",
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "intent_match": false,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "confidence": 0.0
+      }
+    },
+    {
+      "query": "Does Apple's earnings affect my portfolio?",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "hybrid",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AAPL"
+      ],
+      "intent_match": false,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [
+          "AAPL",
+          "Apple"
+        ],
+        "confidence": 0.95
+      }
+    },
+    {
+      "query": "Show me Amazon's performance",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AMZN"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [
+          "AMZN",
+          "Amazon"
+        ],
+        "confidence": 0.95
+      }
+    },
+    {
+      "query": "What is the market sentiment today?",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "market",
+        "entities": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [
+            "today"
+          ],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": [
+            "market sentiment"
+          ]
+        },
+        "confidence": 0.0
+      }
+    },
+    {
+      "query": "Tell me about Google",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [
+        "GOOG"
+      ],
+      "expected_entities": [
+        "GOOG"
+      ],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "market",
+        "entities": {
+          "stocks": [
+            {
+              "ticker": "GOOG",
+              "raw_mention": "Google",
+              "normalization_source": "symbol_map",
+              "confidence": "high",
+              "context_derived": false
+            }
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "confidence": 0.0
+      }
+    },
+    {
+      "query": "Blah blah blah",
+      "context": null,
+      "predicted_intent": "unknown",
+      "expected_intent": "unknown",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "unknown",
+        "entities": [],
+        "confidence": 0.5
+      }
+    }
+  ],
+  "metrics": {
+    "total_cases": 10,
+    "passed_cases": 4,
+    "failed_cases": 6,
+    "overall_accuracy": 40.0,
+    "intent_accuracy": 60.0,
+    "entity_accuracy": 50.0,
+    "intent_failures": 4,
+    "entity_failures": 5
+  },
+  "failure_analysis": {
+    "intent_failures": [
+      {
+        "query": "Compare Tesla and Microsoft",
+        "context": null,
+        "predicted": "market",
+        "expected": "portfolio"
+      },
+      {
+        "query": "How is it performing?",
+        "context": "Show me Tesla",
+        "predicted": "market",
+        "expected": "portfolio"
+      },
+      {
+        "query": "Compare them",
+        "context": "Show me Tesla and Microsoft",
+        "predicted": "market",
+        "expected": "portfolio"
+      },
+      {
+        "query": "Does Apple's earnings affect my portfolio?",
+        "context": null,
+        "predicted": "portfolio",
+        "expected": "hybrid"
+      }
+    ],
+    "entity_failures": [
+      {
+        "query": "Latest news on Tesla",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "TSLA"
+        ]
+      },
+      {
+        "query": "How is it performing?",
+        "context": "Show me Tesla",
+        "predicted": [],
+        "expected": [
+          "TSLA"
+        ]
+      },
+      {
+        "query": "Compare them",
+        "context": "Show me Tesla and Microsoft",
+        "predicted": [],
+        "expected": [
+          "TSLA",
+          "MSFT"
+        ]
+      },
+      {
+        "query": "Does Apple's earnings affect my portfolio?",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AAPL"
+        ]
+      },
+      {
+        "query": "Show me Amazon's performance",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AMZN"
+        ]
+      }
+    ]
+  }
+}

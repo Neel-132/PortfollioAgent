@@ -8,6 +8,8 @@ import backend.constant as constant
 from typing import List, Dict
 import yfinance as yf
 import json
+from ..agents.retriever import KnowledgeBaseRetrieverAgent
+from qdrant_client import QdrantClient
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -16,6 +18,13 @@ FINNHUB_NEWS_ENDPOINT = constant.finhub_news_endpoint
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+qdrant_client = QdrantClient(url="http://localhost:6333")
+
+kb_agent = KnowledgeBaseRetrieverAgent(
+    qdrant_client=qdrant_client,
+    collection_name="sec_filings",
+)
 
 CACHE_FILE = constant.CACHE_MARKETDATA_FILE
 
@@ -142,23 +151,24 @@ def get_latest_price(symbol: str) -> float:
 def process_market_query(entities: List[str], session: Dict) -> Dict:
     """
     Core logic for handling market queries:
-    - Reads cache for news/filings
+    - Reads cache for news
     - Fetches from live APIs if not cached
-    - Updates cache if needed
     - Always fetches latest price
+    - Dynamically retrieves relevant filings context from KB (no cache)
     """
     cache = _load_market_cache()
     results = {}
     cache_updated = False
+    
+
 
     for symbol in entities:
         symbol = symbol.upper()
         try:
             cached = cache.get(symbol, {})
             news_data = cached.get("news", [])
-            filings_data = cached.get("filings", [])
 
-            # If missing in cache, fetch fresh and update
+            # Fetch news if not cached
             if not news_data:
                 logger.info(f"No cached news for {symbol}. Fetching live...")
                 fresh_news = fetch_news_data([symbol])
@@ -166,24 +176,25 @@ def process_market_query(entities: List[str], session: Dict) -> Dict:
                 cached["news"] = news_data
                 cache_updated = True
 
-            if not filings_data:
-                logger.info(f"No cached filings for {symbol}. Fetching live...")
-                fresh_filings = fetch_sec_filings([symbol])
-                filings_data = fresh_filings.get(symbol, [])
-                cached["filings"] = filings_data
-                cache_updated = True
-
             # Always fetch latest price
             latest_price = get_latest_price(symbol)
+
+            # 🔹 NEW: Retrieve filings context dynamically from Qdrant KB
+            kb_response = kb_agent.run(
+                query=f"Relevant SEC filings context for {symbol}",
+                ticker=symbol,
+                filing_type=None,     # optional — could be set later by planner
+            )
+
+            filings_context = kb_response.get("results", []) if kb_response["status"] == "success" else []
 
             results[symbol] = {
                 "latest_price": latest_price,
                 "news": news_data,
-                "filings": filings_data,
+                "filings_context": filings_context,   # ⚡ dynamic retrieval, not cached
                 "timestamp": datetime.utcnow().isoformat()
             }
 
-            # Save updated entry to cache
             cache[symbol] = cached
 
         except Exception as e:
@@ -191,7 +202,7 @@ def process_market_query(entities: List[str], session: Dict) -> Dict:
             results[symbol] = {
                 "latest_price": None,
                 "news": [],
-                "filings": [],
+                "filings_context": [],
                 "error": str(e)
             }
 
@@ -199,6 +210,7 @@ def process_market_query(entities: List[str], session: Dict) -> Dict:
         _save_market_cache(cache)
 
     return results
+
 
 
 

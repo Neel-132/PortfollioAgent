@@ -33,3 +33,6 @@ class PortfolioFunctions:
     
     def get_holdings(self, include_details=False):
         return self.calculator.get_holdings(include_details = include_details)
+    
+    def get_market_cap_allocation(self):
+        return self.calculator.get_market_cap_allocation()

@@ -126,3 +126,61 @@ class CalculatorTool:
         weight = (ticker_value / total_value) * 100
 
         return {"ticker": ticker, "weight_in_portfolio": round(weight, 2)}
+    
+    
+    # def get_market_cap_allocation(self) -> Dict:
+    #     """
+    #     Calculate portfolio allocation by market cap bucket.
+    #     Uses the `market_cap_bucket` column in the portfolio_df.
+    #     """
+    #     holdings = self._attach_prices(self._filter_holdings())
+    #     total_value = sum(h["quantity"] * h["current_price"] for h in holdings)
+
+    #     bucket_allocs: Dict[str, float] = {}
+    #     for h in holdings:
+    #         bucket = h.get("market_cap_bucket", "Unknown")
+    #         value = h["quantity"] * h["current_price"]
+    #         bucket_allocs[bucket] = bucket_allocs.get(bucket, 0.0) + value
+
+    #     if total_value > 0:
+    #         bucket_allocs = {
+    #             k: round(v / total_value * 100, 2) for k, v in bucket_allocs.items()
+    #         }
+    #     else:
+    #         bucket_allocs = {k: 0.0 for k in bucket_allocs}
+
+    #     return {"market_cap_allocations": bucket_allocs}
+    
+    def get_market_cap_allocation(self) -> Dict:
+        """
+        Calculate portfolio allocation by market cap bucket.
+        Uses the `market_cap_bucket` column in the portfolio_df.
+        Returns allocation % and list of tickers under each bucket.
+        """
+        holdings = self._attach_prices(self._filter_holdings())
+        total_value = sum(h["quantity"] * h["current_price"] for h in holdings)
+
+        bucket_allocs: Dict[str, Dict] = {}
+        for h in holdings:
+            bucket = h.get("market_cap_bucket", "Unknown")
+            value = h["quantity"] * h["current_price"]
+            symbol = h["symbol"]
+
+            if bucket not in bucket_allocs:
+                bucket_allocs[bucket] = {"allocation_percent": 0.0, "symbols": [], "total_value": 0.0}
+
+            bucket_allocs[bucket]["symbols"].append(symbol)
+            bucket_allocs[bucket]["total_value"] += value
+
+        # Calculate final allocation %
+        for bucket, data in bucket_allocs.items():
+            if total_value > 0:
+                data["allocation_percent"] = round(data["total_value"] / total_value * 100, 2)
+            else:
+                data["allocation_percent"] = 0.0
+            # Drop total_value from final response if not needed
+            del data["total_value"]
+
+        return {"market_cap_allocations": bucket_allocs}
+
+

@@ -4,6 +4,9 @@ import logging
 from typing import Optional, Dict, Any, List
 from google import genai
 from google.genai import types
+import numpy as np
+import backend.constant as constant
+import time
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -18,7 +21,7 @@ class GeminiClient:
     def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-flash"):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
-            raise ValueError("❌ Gemini API key not provided and GEMINI_API_KEY not set.")
+            raise ValueError("Gemini API key not provided and GEMINI_API_KEY not set.")
 
         os.environ["GOOGLE_API_KEY"] = self.api_key
         self.client = genai.Client()
@@ -64,6 +67,7 @@ class GeminiClient:
         system_instruction: str,
         entities: List[str],
         chat_history: dict[Any],
+        classification_metadata:dict[Any],
         model: Optional[str] = None
     ) -> Dict[str, Any]:
         """
@@ -73,13 +77,26 @@ class GeminiClient:
         selected_model = model or self.model
 
         try:
+            function_calls = []
             # Define tools from function schema
             tools = types.Tool(function_declarations=function_schema)
+
             config = types.GenerateContentConfig(tools=[tools])
+            config = types.GenerateContentConfig(
+            tools=[tools],
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(
+                    disable=True
+                ),
+                # Force the model to call 'any' function, instead of chatting.
+                tool_config=types.ToolConfig(
+                    function_calling_config=types.FunctionCallingConfig(mode='ANY')
+                ),
+            )
+
             # formatted_prompt = f"{system_instruction}\n UserQuery \n \n {user_query}"
             formatted_prompt = system_instruction \
             .replace("{{ENTITIES}}", str(entities)) \
-            .replace("{{CONVERSATION_HISTORY}}", str(chat_history)) \
+            .replace("{{CLASSIFICATION_METADATA}}", str(classification_metadata)) \
             .replace("{{CURRENT_QUERY}}", user_query)
             
             if formatted_prompt is None:
@@ -90,25 +107,27 @@ class GeminiClient:
                 contents=formatted_prompt,
                 config=config
             )
-        
             # Parse function call if present
             candidate = response.candidates[0]
             parts = candidate.content.parts
             
-            if parts and parts[0].function_call:
-                fn_call = parts[0].function_call
-                fn_name = fn_call.name
-                fn_args = dict(fn_call.args)
-
+            if parts:
+                for part in parts:
+                    if part.function_call:
+                        fn_call = part.function_call
+                        fn_name = fn_call.name
+                        fn_args = dict(fn_call.args)
+                        function_calls.append({"name": fn_name, "arguments": fn_args})
+                    
+            # if parts and parts[0].function_call:
+            #     fn_call = parts[0].function_call
+            #     fn_name = fn_call.name
+            #     fn_args = dict(fn_call.args)
+                
                 logger.info(f"Function call detected: {fn_name} with args {fn_args}")
                 return {
                     "status": "success",
-                    "function_calls": [
-                        {
-                            "name": fn_name,
-                            "arguments": fn_args
-                        }
-                    ]
+                    "function_calls": function_calls
                 }
 
             # If no function call, fallback to normal text
@@ -118,4 +137,47 @@ class GeminiClient:
         except Exception as e:
             logger.error(f"Function calling failed: {e}", exc_info=True)
             return {"status": "error", "message": str(e)}
+        
+    
+
+    def get_gemini_embedding(self, text: str, task: str = "retrieval_document", model = "models/embedding-001"):
+        """
+        Generate Gemini embeddings for a given text with proper error handling.
+        
+        Args:
+            text (str): The input text to embed.
+            task (str): One of ["retrieval_document", "retrieval_query", "semantic_similarity"].
+        
+        Returns:
+            list[float]: Embedding vector if successful, empty list otherwise.
+        """
+        if not text or not isinstance(text, str):
+            logger.warning("Invalid input text for embedding.")
+            return []
+
+        # Map task to Gemini config
+        task_map = {
+            "retrieval_document": "RETRIEVAL_DOCUMENT",
+            "retrieval_query": "RETRIEVAL_QUERY",
+            "semantic_similarity": "SEMANTIC_SIMILARITY"
+        }
+        task_type = task_map.get(task.lower(), "SEMANTIC_SIMILARITY")
+
+        try:
+            time.sleep(60)
+            response = self.client.models.embed_content(
+                model=model,
+                contents=text,
+                config=types.EmbedContentConfig(task_type=task_type)
+            ).embeddings
+
+            if not response or not isinstance(response[0].values, list):
+                logger.error(f"Invalid embedding response for text: {text[:80]}...")
+                return []
+
+            return response[0].values
+
+        except Exception as e:
+            logger.error(f"Unexpected error during embedding: {e}", exc_info=True)
+            return []
 

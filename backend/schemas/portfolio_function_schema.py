@@ -86,5 +86,13 @@ PORTFOLIO_FUNCTION_SCHEMA = [
                 }
             }
         }
+    },
+    {
+        "name": "get_market_cap_allocation",
+        "description": "Get portfolio allocation by market cap bucket (e.g., Large Cap, Mid Cap, Small Cap, Unknown).",
+        "parameters": {
+            "type": "object",
+            "properties": {}
+        }
     }
 ]

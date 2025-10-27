@@ -55,17 +55,22 @@ def portfolio_snapshot(portfolio_data):
         return
 
     results = portfolio_data.get("results", [])
-    if results:
-        df = pd.DataFrame(results)
-        st.sidebar.dataframe(df)
+    try:
+        if results:
+            df = pd.DataFrame(results)
+            st.sidebar.dataframe(df)
 
-    # sector allocation chart if available
-    if "portfolio_summary" in portfolio_data:
-        alloc = portfolio_data["portfolio_summary"].get("sector_allocations", {})
-        if alloc:
-            alloc_df = pd.DataFrame({"Sector": list(alloc.keys()), "Allocation": list(alloc.values())})
-            fig = px.pie(alloc_df, names="Sector", values="Allocation")
-            st.sidebar.plotly_chart(fig, use_container_width=True)
+        # sector allocation chart if available
+        if "portfolio_summary" in portfolio_data:
+            alloc = portfolio_data["portfolio_summary"].get("sector_allocations", {})
+            if alloc:
+                alloc_df = pd.DataFrame({"Sector": list(alloc.keys()), "Allocation": list(alloc.values())})
+                fig = px.pie(alloc_df, names="Sector", values="Allocation")
+                st.sidebar.plotly_chart(fig, use_container_width=True)
+
+    except Exception as e:
+        st.sidebar.write("No portfolio data loaded.")
+        
 
 # ------------------------------------------------
 # 4. Sidebar - Market Intelligence Snapshot
@@ -116,7 +121,8 @@ def chat_interface():
             st.session_state["session"] = None
         
         # Call backend
-        result = run_query(query, st.session_state["client_id"], st.session_state["session_id"],  previous_session=st.session_state["session"])
+        with st.spinner("Reasoning..."):
+            result = run_query(query, st.session_state["client_id"], st.session_state["session_id"],  previous_session=st.session_state["session"])
 
         session = result.get("session", {})
         st.session_state["session"] = session

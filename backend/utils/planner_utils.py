@@ -60,7 +60,10 @@ def process_planning(classification_result: Dict, routing_table: Dict, user_quer
     try:
         if intent == "portfolio":
             logger.info(f"Function calling triggered for portfolio intent | Query: {user_query}")
-            fn_result = llm.function_call(user_query, PORTFOLIO_FUNCTION_SCHEMA, constant.portfolio_functioncalling_prompt, entities, chat_history_string)
+            
+            entity_dict = classification_result.get("entity_dict", {})
+            classification_metadata = classification_result.get("classification_metadata", {})
+            fn_result = llm.function_call(user_query, PORTFOLIO_FUNCTION_SCHEMA, constant.portfolio_functioncalling_prompt, entity_dict, chat_history_string, classification_metadata)
 
             if fn_result["status"] == "success":
                 execution_plan["function_calls"] = fn_result["function_calls"]
@@ -79,7 +82,10 @@ def process_planning(classification_result: Dict, routing_table: Dict, user_quer
 
         elif intent == "hybrid":
             logger.info(f"Hybrid intent detected — portfolio + market")
-            fn_result = llm.function_call(user_query, PORTFOLIO_FUNCTION_SCHEMA, constant.portfolio_functioncalling_prompt, entities, chat_history_string)
+            entity_dict = classification_result.get("entity_dict", {})
+            classification_metadata = classification_result.get("classification_metadata", {})
+            # fn_result = llm.function_call(user_query, PORTFOLIO_FUNCTION_SCHEMA, constant.portfolio_functioncalling_prompt, entities, chat_history_string)
+            fn_result = llm.function_call(user_query, PORTFOLIO_FUNCTION_SCHEMA, constant.portfolio_functioncalling_prompt, entity_dict, chat_history_string, classification_metadata)
 
             
             if fn_result["status"] == "success":

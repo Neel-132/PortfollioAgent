@@ -19,6 +19,7 @@ logger.setLevel(logging.INFO)
 # 1. Define the shared state schema
 def initial_state(query: str, client_id: str, session_id: str, previous_session=None) -> Dict:
     if previous_session is None:
+      
         loader = DependencyLoader()
         session = loader.load_client_dependencies(client_id, session_id)
     else:
@@ -260,6 +261,8 @@ def run_query(query: str, client_id: str, session_id: str, previous_session: Dic
         "market_response": final_state.get("market_data", {}),
         "final_response": final_state.get("final_response", {}),
     }
+
+  
  
     if previous_session is None:
         previous_session = final_state.get("session", {}).copy()

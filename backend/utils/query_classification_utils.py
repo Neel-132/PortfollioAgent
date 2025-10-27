@@ -40,7 +40,7 @@ def rule_based_classify(query: str, portfolio_keywords: list[str], market_keywor
             confidence = 0.5
 
         logger.info(f"Entities detected for the query: {entities}")
-
+        confidence = 0.5
         return {
             "intent": intent,
             "entities": list(set(entities)),
@@ -61,7 +61,7 @@ def llm_classify(prompt: str, symbol_map: Dict[str, list], query: str, previous_
     Uses Gemini to classify query into intent and extract entities,
     with access to symbol map and previous conversation history.
     """
-    logger.info(f"🧠 LLM-based classification triggered for query: {query}")
+    logger.info(f"LLM-based classification triggered for query: {query}")
 
     try:
         # Build conversation history string
@@ -78,31 +78,37 @@ def llm_classify(prompt: str, symbol_map: Dict[str, list], query: str, previous_
         symbol_map_str = str(symbol_map)
 
         # Format full prompt
-        full_prompt = (
-            f"{prompt}\n\n"
-            f"SYMBOL_NAME_MAP_JSON:\n{symbol_map_str}\n\n"
-            f"CONVERSATION_HISTORY:\n{history_str}\n\n"
-            f"User Query: {query}"
-        )
-
+        # full_prompt = (
+        #     f"{prompt}\n\n"
+        #     f"SYMBOL_NAME_MAP_JSON:\n{symbol_map_str}\n\n"
+        #     f"CONVERSATION_HISTORY:\n{history_str}\n\n"
+        #     f"User Query: {query}"
+        # )
+        full_prompt = prompt.replace("{{SYMBOL_NAME_MAP_JSON}}", symbol_map_str).replace("{{CONVERSATION_HISTORY}}", history_str).replace("{{USER_QUERY}}", query)
+        
         llm = GeminiClient()
         result = llm.generate_text(full_prompt, parse_json=True)
-
+        entities, entity_dict, cls_metadatadict = helper.extract_all_stock_entities(result)
+        
         # Handle invalid or empty responses
         if not result or "intent" not in result:
-            logger.warning(f"⚠️ LLM classification returned invalid or empty response: {result}")
+            logger.warning(f"LLM classification returned invalid or empty response: {result}")
             return {
                 "intent": "unknown",
                 "entities": [],
-                "confidence": 0.0
+                "confidence": 0.0,
+                "entity_dict": {},
+                "classification_metadata": {}
             }
 
-        logger.info(f"✅ LLM classification result: {result}")
+        logger.info(f"LLM classification result: {result}")
 
         return {
             "intent": result.get("intent", "unknown"),
-            "entities": result.get("entities", []),
-            "confidence": result.get("confidence", 0.0)
+            "entities": entities,
+            "confidence": result.get("confidence", 0.0),
+            "entity_dict": entity_dict,
+            "classification_metadata": cls_metadatadict
         }
 
     except Exception as e:
@@ -110,7 +116,9 @@ def llm_classify(prompt: str, symbol_map: Dict[str, list], query: str, previous_
         return {
             "intent": "unknown",
             "entities": [],
-            "confidence": 0.0
+            "confidence": 0.0,
+            "entity_dict": {},
+            "classification_metadata": {}
         }
 
 

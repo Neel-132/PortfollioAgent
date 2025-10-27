@@ -231,6 +231,13 @@ def escape_markdown(text):
     
     return text
 
+def escape_dollar_signs(text):
+    """Escape dollar signs for Streamlit markdown rendering while preserving markdown syntax"""
+    # Replace single $ with \$ to prevent LaTeX rendering
+    # But avoid replacing $$ (which is intentional LaTeX)
+    text = re.sub(r'\$(?!\$)', r'\\$', text)
+    return text
+
 def prepare_chat_history_string(chat_history):
     if len(chat_history) > 0:
         chat_history_string = "\n".join([
@@ -241,6 +248,52 @@ def prepare_chat_history_string(chat_history):
         chat_history_string = ""
     return chat_history_string
 
+def extract_all_stock_entities(classification_result):
+    try:
+        """
+        Extract all stock ticker entities from the new classification format
+        and return them as a single flat list.
+        """
+        all_tickers = []
+        
+        # Extract from current query entities
+        if "entities" in classification_result and "stocks" in classification_result["entities"]:
+            for stock in classification_result["entities"]["stocks"]:
+                if isinstance(stock, dict) and "ticker" in stock:
+                    ticker = stock["ticker"]
+                    # Skip unresolved entities
+                    if ticker != "UNRESOLVED":
+                        all_tickers.append(ticker)
+                elif isinstance(stock, str):
+                    # Handle case where stock is just a string ticker
+                    all_tickers.append(stock)
+        
+        # Extract from context entities
+        if "context_entities" in classification_result and "stocks" in classification_result["context_entities"]:
+            for stock in classification_result["context_entities"]["stocks"]:
+                if isinstance(stock, dict) and "ticker" in stock:
+                    ticker = stock["ticker"]
+                    if ticker != "UNRESOLVED":
+                        all_tickers.append(ticker)
+                elif isinstance(stock, str):
+                    all_tickers.append(stock)
+        
+        # Deduplicate while preserving order
+        seen = set()
+        unique_tickers = []
+        for ticker in all_tickers:
+            if ticker not in seen:
+                seen.add(ticker)
+                unique_tickers.append(ticker)
+        
+        
+        entity_dict = classification_result.get("entities", {}).copy()
+        entity_dict['stocks'] = unique_tickers
+        return unique_tickers, entity_dict, classification_result.get("metadata", {})
+
+    except Exception as e:
+        logger.error(f"Failed to extract stock entities: {e}", exc_info=True)
+        return [], {}, {}
 
 
 def initialize_workflow_log(state: Dict, original_query: str) -> None:
@@ -281,3 +334,4 @@ def get_workflow_log(state: Dict) -> Dict:
     Safely retrieve the workflow log from state.
     """
     return state.get("workflow_log", {})
+

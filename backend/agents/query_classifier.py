@@ -30,7 +30,7 @@ class QueryClassificationAgent:
         """
         Classifies query using rules, falls back to LLM if needed.
         """
-        logger.info(f"🧠 Classifying query: {query}")
+        logger.info(f"Classifying query: {query}")
         logger.debug(f"Symbol name map provided: {bool(symbol_name_map)}")
 
         # STEP 1: Rule-based classification
@@ -40,7 +40,7 @@ class QueryClassificationAgent:
         # STEP 2: Fallback to LLM if needed
         if result["intent"] == "unknown" or result["confidence"] < self.llm_confidence_threshold:
             logger.info(f"Triggering LLM fallback for query: '{query}'")
-            llm_result = self._llm_classify(symbol_name_map, query, chat_history)
+            llm_result = self.llm_classify(symbol_name_map, query, chat_history)
 
             if llm_result and llm_result.get("intent") != "unknown":
                 logger.debug(f"LLM classification result: {llm_result}")
@@ -48,7 +48,7 @@ class QueryClassificationAgent:
             else:
                 logger.warning(f"LLM fallback returned None or unknown for query: '{query}'")
 
-        logger.info(f"✅ Final classification result: {result}")
+        logger.info(f"Final classification result: {result}")
         return result
 
     def _rule_based_classify(
@@ -69,7 +69,7 @@ class QueryClassificationAgent:
         )
         return result
 
-    def _llm_classify(self, symbol_name_map, query: str, chat_history:dict) -> Optional[Dict]:
+    def llm_classify(self, symbol_name_map, query: str, chat_history:dict) -> Optional[Dict]:
         """
         Placeholder for LLM-based classification.
         """

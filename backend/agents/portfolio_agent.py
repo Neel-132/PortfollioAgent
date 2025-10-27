@@ -18,7 +18,7 @@ class PortfolioAgent:
     """
 
     def __init__(self):
-        logger.debug("📌 PortfolioAgent initialized.")
+        logger.debug("PortfolioAgent initialized.")
 
     def run(self, execution_plan: Dict, session: Dict, client_id:str) -> Dict:
         """
@@ -27,7 +27,7 @@ class PortfolioAgent:
         entities = execution_plan.get("entities", [])
 
         logger.info(
-            f"📊 PortfolioAgent invoked | "
+            f"PortfolioAgent invoked | "
             f"client_id={client_id} | intent={execution_plan.get('intent')} | entities={entities}"
         )
 
@@ -36,17 +36,17 @@ class PortfolioAgent:
         
             if response.get("status") == "success":
                 logger.info(
-                    f"✅ PortfolioAgent processed query for client_id={client_id} "
+                    f"PortfolioAgent processed query for client_id={client_id} "
                     f"with {response.get('total_holdings', 0)} holdings"
                 )
             elif response.get("status") == "not_found":
                 logger.warning(
-                    f"⚠️ PortfolioAgent: No matching holdings found "
+                    f"PortfolioAgent: No matching holdings found "
                     f"for client_id={client_id}, entities={entities}"
                 )
             else:
                 logger.error(
-                    f"❌ PortfolioAgent returned error for client_id={client_id}: "
+                    f"PortfolioAgent returned error for client_id={client_id}: "
                     f"{response.get('message', 'Unknown error')}"
                 )
 
@@ -55,7 +55,7 @@ class PortfolioAgent:
 
         except Exception as e:
             logger.error(
-                f"❌ PortfolioAgent failed for client_id={client_id}: {e}",
+                f"PortfolioAgent failed for client_id={client_id}: {e}",
                 exc_info=True
             )
             return {
