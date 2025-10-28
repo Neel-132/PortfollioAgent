@@ -16,61 +16,44 @@ test_symbol_map = {
 
 # Test cases
 test_cases = [
+    # --- Portfolio Intent ---
     {"query": "What are my holdings?", "expected_intent": "portfolio", "expected_entities": []},
-    {"query": "Latest news on Tesla", "expected_intent": "market", "expected_entities": ["TSLA"]},
+    {"query": "Show me Apple’s performance", "expected_intent": "portfolio", "expected_entities": ["AAPL"]},
     {"query": "Compare Tesla and Microsoft", "expected_intent": "portfolio", "expected_entities": ["TSLA", "MSFT"]},
     {"query": "How is it performing?", "context": "Show me Tesla", "expected_intent": "portfolio", "expected_entities": ["TSLA"]},
     {"query": "Compare them", "context": "Show me Tesla and Microsoft", "expected_intent": "portfolio", "expected_entities": ["TSLA", "MSFT"]},
-    {"query": "Does Apple's earnings affect my portfolio?", "expected_intent": "hybrid", "expected_entities": ["AAPL"]},
-    {"query": "Show me Amazon's performance", "expected_intent": "portfolio", "expected_entities": ["AMZN"]},
-    {"query": "What is the market sentiment today?", "expected_intent": "market", "expected_entities": []},
+    {"query": "Add Amazon to my portfolio", "expected_intent": "portfolio", "expected_entities": ["AMZN"]},
+    {"query": "Remove Tesla from my portfolio", "expected_intent": "portfolio", "expected_entities": ["TSLA"]},
+    {"query": "Rebalance my portfolio", "expected_intent": "portfolio", "expected_entities": []},
+    {"query": "Show me my gains in Apple and Amazon", "expected_intent": "portfolio", "expected_entities": ["AAPL", "AMZN"]},
+    {"query": "Check Microsoft and Google in my portfolio", "expected_intent": "portfolio", "expected_entities": ["MSFT", "GOOG"]},
+
+    # --- Market Intent ---
+    {"query": "Latest news on Tesla", "expected_intent": "market", "expected_entities": ["TSLA"]},
     {"query": "Tell me about Google", "expected_intent": "market", "expected_entities": ["GOOG"]},
-    {"query": "Blah blah blah", "expected_intent": "unknown", "expected_entities": []}
+    {"query": "What's the market sentiment today?", "expected_intent": "market", "expected_entities": []},
+    {"query": "What’s happening with Amazon lately?", "expected_intent": "market", "expected_entities": ["AMZN"]},
+    {"query": "How is Apple performing in the market?", "expected_intent": "market", "expected_entities": ["AAPL"]},
+
+    # --- Hybrid Intent ---
+    {"query": "Does Apple's earnings affect my portfolio?", "expected_intent": "hybrid", "expected_entities": ["AAPL"]},
+    {"query": "Will Tesla’s price drop impact my portfolio?", "expected_intent": "hybrid", "expected_entities": ["TSLA"]},
+    {"query": "Will news about Microsoft and Google change my returns?", "expected_intent": "hybrid", "expected_entities": ["MSFT", "GOOG"]},
+
+    # --- Unknown / Fallback ---
+    {"query": "Blah blah blah", "expected_intent": "unknown", "expected_entities": []},
+    {"query": "What do you think about life?", "expected_intent": "unknown", "expected_entities": []}
 ]
 
-def extract_all_stock_entities(classification_result):
-    """
-    Extract all stock ticker entities from the new classification format
-    and return them as a single flat list.
-    """
-    all_tickers = []
-    
-    # Extract from current query entities
-    if "entities" in classification_result and "stocks" in classification_result["entities"]:
-        for stock in classification_result["entities"]["stocks"]:
-            if isinstance(stock, dict) and "ticker" in stock:
-                ticker = stock["ticker"]
-                # Skip unresolved entities
-                if ticker != "UNRESOLVED":
-                    all_tickers.append(ticker)
-            elif isinstance(stock, str):
-                # Handle case where stock is just a string ticker
-                all_tickers.append(stock)
-    
-    # Extract from context entities
-    if "context_entities" in classification_result and "stocks" in classification_result["context_entities"]:
-        for stock in classification_result["context_entities"]["stocks"]:
-            if isinstance(stock, dict) and "ticker" in stock:
-                ticker = stock["ticker"]
-                if ticker != "UNRESOLVED":
-                    all_tickers.append(ticker)
-            elif isinstance(stock, str):
-                all_tickers.append(stock)
-    
-    # Deduplicate while preserving order
-    seen = set()
-    unique_tickers = []
-    for ticker in all_tickers:
-        if ticker not in seen:
-            seen.add(ticker)
-            unique_tickers.append(ticker)
-    
-    return unique_tickers
-
-# Evaluation loop
+# Metrics counters
 results = []
 intent_correct = 0
 entity_correct = 0
+
+# Entity precision/recall components
+total_tp_entities = 0
+total_fp_entities = 0
+total_fn_entities = 0
 
 for case in test_cases:
     query = case["query"]
@@ -83,58 +66,83 @@ for case in test_cases:
             "system": {"role": "assistant", "text": ""}
         })
 
-    # Get classification result
+    # Run classification
     result = agent.llm_classify(test_symbol_map, query, session.get("chat_history", []))
-    
-    # Extract all stock entities into a single flat list
-    predicted_entities = extract_all_stock_entities(result)
-    
-    # Compare intent and entities
-    intent_match = result["intent"] == case["expected_intent"]
-    entity_match = set(predicted_entities) == set(case["expected_entities"])
-    passed = intent_match and entity_match
+    predicted_entities = result.get('entities', [])
 
+    expected_entities = case["expected_entities"]
+    predicted_intent = result["intent"]
+    expected_intent = case["expected_intent"]
+
+    # Intent match
+    intent_match = predicted_intent == expected_intent
     if intent_match:
         intent_correct += 1
+
+    # Entity match (for accuracy)
+    entity_match = set(predicted_entities) == set(expected_entities)
     if entity_match:
         entity_correct += 1
+
+    # Entity TP, FP, FN for precision/recall
+    tp = len(set(predicted_entities) & set(expected_entities))
+    fp = len(set(predicted_entities) - set(expected_entities))
+    fn = len(set(expected_entities) - set(predicted_entities))
+
+    total_tp_entities += tp
+    total_fp_entities += fp
+    total_fn_entities += fn
 
     results.append({
         "query": query,
         "context": context,
-        "predicted_intent": result["intent"],
-        "expected_intent": case["expected_intent"],
+        "predicted_intent": predicted_intent,
+        "expected_intent": expected_intent,
         "predicted_entities": predicted_entities,
-        "expected_entities": case["expected_entities"],
+        "expected_entities": expected_entities,
         "intent_match": intent_match,
         "entity_match": entity_match,
-        "pass": passed,
-        "full_classification": result  # Store full result for debugging
+        "pass": intent_match and entity_match,
+        "full_classification": result
     })
 
-# Accuracy metrics
+# Accuracy
 total_cases = len(test_cases)
 overall_accuracy = sum(r["pass"] for r in results) / total_cases * 100
 intent_accuracy = intent_correct / total_cases * 100
 entity_accuracy = entity_correct / total_cases * 100
 
-# Detailed failure analysis
+# Precision, Recall, F1
+# Intent: same as accuracy since single-label
+intent_precision = intent_recall = intent_accuracy / 100
+intent_f1 = (2 * intent_precision * intent_recall) / (intent_precision + intent_recall) if (intent_precision + intent_recall) else 0
+
+# Entity
+entity_precision = total_tp_entities / (total_tp_entities + total_fp_entities) if (total_tp_entities + total_fp_entities) > 0 else 0
+entity_recall = total_tp_entities / (total_tp_entities + total_fn_entities) if (total_tp_entities + total_fn_entities) > 0 else 0
+entity_f1 = (2 * entity_precision * entity_recall) / (entity_precision + entity_recall) if (entity_precision + entity_recall) > 0 else 0
+
+# Failure analysis
 failed_cases = [r for r in results if not r["pass"]]
 intent_failures = [r for r in results if not r["intent_match"]]
 entity_failures = [r for r in results if not r["entity_match"]]
 
-# Save results to file
+# Save results
 output_file = f"evaluations/query_classification_test_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
 with open(output_file, "w", encoding="utf-8") as f:
     json.dump({
         "results": results,
         "metrics": {
             "total_cases": total_cases,
-            "passed_cases": sum(r["pass"] for r in results),
-            "failed_cases": len(failed_cases),
             "overall_accuracy": overall_accuracy,
             "intent_accuracy": intent_accuracy,
             "entity_accuracy": entity_accuracy,
+            "intent_precision": intent_precision,
+            "intent_recall": intent_recall,
+            "intent_f1": intent_f1,
+            "entity_precision": entity_precision,
+            "entity_recall": entity_recall,
+            "entity_f1": entity_f1,
             "intent_failures": len(intent_failures),
             "entity_failures": len(entity_failures)
         },
@@ -160,7 +168,7 @@ with open(output_file, "w", encoding="utf-8") as f:
         }
     }, f, indent=2)
 
-# Summary output
+# Summary
 print("=" * 60)
 print("QUERY CLASSIFICATION EVALUATION RESULTS")
 print("=" * 60)
@@ -168,6 +176,10 @@ print(f"\n✅ Passed: {sum(r['pass'] for r in results)}/{total_cases} test cases
 print(f"\n📊 Overall Accuracy: {overall_accuracy:.2f}%")
 print(f"🧠 Intent Accuracy: {intent_accuracy:.2f}%")
 print(f"🏷️  Entity Accuracy: {entity_accuracy:.2f}%")
+
+print("\n--- Precision / Recall / F1 ---")
+print(f"Intent  →  Precision: {intent_precision:.2f} | Recall: {intent_recall:.2f} | F1: {intent_f1:.2f}")
+print(f"Entity  →  Precision: {entity_precision:.2f} | Recall: {entity_recall:.2f} | F1: {entity_f1:.2f}")
 
 if failed_cases:
     print(f"\n❌ Failed Cases: {len(failed_cases)}")
@@ -181,5 +193,5 @@ if failed_cases:
         if not failure['entity_match']:
             print(f"     ❌ Entities: {failure['predicted_entities']} (expected: {failure['expected_entities']})")
 
-print(f"\n💾 Full results saved to {output_file}")
+print(f"\nFull results saved to {output_file}")
 print("=" * 60)
