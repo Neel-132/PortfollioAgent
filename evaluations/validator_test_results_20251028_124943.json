@@ -1,0 +1,134 @@
+{
+  "results": [
+    {
+      "query": "What are my holdings?",
+      "expected_result": "pass",
+      "actual_result": "pass",
+      "expected_failed_agent": null,
+      "actual_failed_agent": null,
+      "reason": null,
+      "pass": true
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PlannerAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as portfolio; 'Compare Tesla and Microsoft' is a market intelligence query.",
+      "pass": true
+    },
+    {
+      "query": "Show me Amazon's performance",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PortfolioAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as portfolio instead of market",
+      "pass": true
+    },
+    {
+      "query": "What's the market sentiment today?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Did not plan any function call to MarketAgent despite market intent, leading to a hallucinated response.",
+      "pass": false
+    },
+    {
+      "query": "How are they performing?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Extracted entities (TSLA, MSFT) were not explicitly mentioned in the original query.",
+      "pass": false
+    },
+    {
+      "query": "How is Tesla performing?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "QueryClassificationAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as 'unknown' instead of 'market' for a query about stock performance.",
+      "pass": true
+    },
+    {
+      "query": "Show my portfolio allocation by sector",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "ResponseGeneratorAgent",
+      "actual_failed_agent": "PortfolioAgent",
+      "reason": "Output is incomplete; it provides a sector but no actual allocation data (e.g., percentages or breakdown of all sectors) as requested by 'portfolio allocation'.",
+      "pass": true
+    },
+    {
+      "query": "Does Apple's earnings affect my portfolio?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Incomplete plan; did not include calls for market data related to earnings despite hybrid intent.",
+      "pass": false
+    },
+    {
+      "query": "What happened to Apple in the news?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "MarketAgent",
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Did not plan any function when it should have; a call to MarketAgent was required for 'market' intent and 'AAPL' entity.",
+      "pass": true
+    },
+    {
+      "query": "Tell me my portfolio value",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PlannerAgent",
+      "actual_failed_agent": "PortfolioAgent",
+      "reason": "PortfolioAgent returned only a status of success without providing any structured portfolio data (e.g., holdings), making its output irrelevant for generating a specific response.",
+      "pass": true
+    },
+    {
+      "query": "How is it performing?",
+      "expected_result": "fail",
+      "actual_result": "pass",
+      "expected_failed_agent": "QueryClassificationAgent",
+      "actual_failed_agent": null,
+      "reason": null,
+      "pass": false
+    },
+    {
+      "query": "What\u2019s happening with Apple and my portfolio?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "MarketAgent",
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "The PlannerAgent's plan was incomplete; it only included a call to 'get_returns' (portfolio data) and did not plan for fetching market intelligence or news for 'Apple', despite the QueryClassificationAgent correctly identifying a 'hybrid' intent and 'AAPL' as an entity from the original query 'What\u2019s happening with Apple and my portfolio?'",
+      "pass": true
+    },
+    {
+      "query": "How is Tesla performing?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "ResponseGeneratorAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as portfolio instead of market",
+      "pass": true
+    },
+    {
+      "query": "Show me market overview",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "PlannerAgent's output `function_calls: []` indicates no functions were planned, but the workflow proceeded to execute MarketAgent, which should have been explicitly planned for a 'market' intent.",
+      "pass": false
+    }
+  ],
+  "metrics": {
+    "total_cases": 14,
+    "accuracy": 64.28571428571429
+  }
+}

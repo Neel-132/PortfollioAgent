@@ -1,0 +1,948 @@
+{
+  "results": [
+    {
+      "query": "What are my holdings?",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": [
+            "holdings"
+          ]
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Show me Apple\u2019s performance",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AAPL"
+      ],
+      "intent_match": false,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "AAPL"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "AAPL"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "performance"
+          ],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "intent_match": false,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "TSLA",
+          "MSFT"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "TSLA",
+            "MSFT"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "How is it performing?",
+      "context": "Show me Tesla",
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "intent_match": false,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "TSLA"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "TSLA"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "performance"
+          ],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": true
+        }
+      }
+    },
+    {
+      "query": "Compare them",
+      "context": "Show me Tesla and Microsoft",
+      "predicted_intent": "market",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA",
+        "MSFT"
+      ],
+      "intent_match": false,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "TSLA",
+          "MSFT"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "TSLA",
+            "MSFT"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "performance"
+          ],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": true
+        }
+      }
+    },
+    {
+      "query": "Add Amazon to my portfolio",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AMZN"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [
+          "AMZN"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "AMZN"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Remove Tesla from my portfolio",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [
+          "TSLA"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "TSLA"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Rebalance my portfolio",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Show me my gains in Apple and Amazon",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AAPL",
+        "AMZN"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [
+          "AAPL",
+          "AMZN"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "AAPL",
+            "AMZN"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "gains"
+          ],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Check Microsoft and Google in my portfolio",
+      "context": null,
+      "predicted_intent": "portfolio",
+      "expected_intent": "portfolio",
+      "predicted_entities": [],
+      "expected_entities": [
+        "MSFT",
+        "GOOG"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "portfolio",
+        "entities": [
+          "MSFT",
+          "GOOG"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "MSFT",
+            "GOOG"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Latest news on Tesla",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "TSLA"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "TSLA"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [
+            "latest"
+          ],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": [
+            "news"
+          ]
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Tell me about Google",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [
+        "GOOG"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "GOOG"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "GOOG"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "What's the market sentiment today?",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "market",
+        "entities": [],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [
+            "today"
+          ],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": [
+            "market sentiment"
+          ]
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "What\u2019s happening with Amazon lately?",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AMZN"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "AMZN"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "AMZN"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [
+            "lately"
+          ],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "How is Apple performing in the market?",
+      "context": null,
+      "predicted_intent": "market",
+      "expected_intent": "market",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AAPL"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "market",
+        "entities": [
+          "AAPL"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "AAPL"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "performance"
+          ],
+          "sectors": [],
+          "other": [
+            "market"
+          ]
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Does Apple's earnings affect my portfolio?",
+      "context": null,
+      "predicted_intent": "hybrid",
+      "expected_intent": "hybrid",
+      "predicted_entities": [],
+      "expected_entities": [
+        "AAPL"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "hybrid",
+        "entities": [
+          "AAPL"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "AAPL"
+          ],
+          "events": [
+            "earnings"
+          ],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "portfolio"
+          ],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Will Tesla\u2019s price drop impact my portfolio?",
+      "context": null,
+      "predicted_intent": "hybrid",
+      "expected_intent": "hybrid",
+      "predicted_entities": [],
+      "expected_entities": [
+        "TSLA"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "hybrid",
+        "entities": [
+          "TSLA"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "TSLA"
+          ],
+          "events": [
+            "price drop"
+          ],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Will news about Microsoft and Google change my returns?",
+      "context": null,
+      "predicted_intent": "hybrid",
+      "expected_intent": "hybrid",
+      "predicted_entities": [],
+      "expected_entities": [
+        "MSFT",
+        "GOOG"
+      ],
+      "intent_match": true,
+      "entity_match": false,
+      "pass": false,
+      "full_classification": {
+        "intent": "hybrid",
+        "entities": [
+          "MSFT",
+          "GOOG"
+        ],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [
+            "MSFT",
+            "GOOG"
+          ],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [
+            "returns"
+          ],
+          "sectors": [],
+          "other": [
+            "news"
+          ]
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "Blah blah blah",
+      "context": null,
+      "predicted_intent": "unknown",
+      "expected_intent": "unknown",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "unknown",
+        "entities": [],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": true,
+          "clarification_reason": "The query is unclear and does not appear to be related to finance or investing.",
+          "conversation_context_used": false
+        }
+      }
+    },
+    {
+      "query": "What do you think about life?",
+      "context": null,
+      "predicted_intent": "unknown",
+      "expected_intent": "unknown",
+      "predicted_entities": [],
+      "expected_entities": [],
+      "intent_match": true,
+      "entity_match": true,
+      "pass": true,
+      "full_classification": {
+        "intent": "unknown",
+        "entities": [],
+        "confidence": 0.0,
+        "entity_dict": {
+          "stocks": [],
+          "events": [],
+          "geopolitical": [],
+          "economic_indicators": [],
+          "temporal": [],
+          "market_indices": [],
+          "financial_metrics": [],
+          "sectors": [],
+          "other": []
+        },
+        "classification_metadata": {
+          "requires_clarification": false,
+          "clarification_reason": "",
+          "conversation_context_used": false
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "total_cases": 20,
+    "passed_cases": 5,
+    "failed_cases": 15,
+    "overall_accuracy": 25.0,
+    "intent_accuracy": 80.0,
+    "entity_accuracy": 25.0,
+    "intent_failures": 4,
+    "entity_failures": 15
+  },
+  "failure_analysis": {
+    "intent_failures": [
+      {
+        "query": "Show me Apple\u2019s performance",
+        "context": null,
+        "predicted": "market",
+        "expected": "portfolio"
+      },
+      {
+        "query": "Compare Tesla and Microsoft",
+        "context": null,
+        "predicted": "market",
+        "expected": "portfolio"
+      },
+      {
+        "query": "How is it performing?",
+        "context": "Show me Tesla",
+        "predicted": "market",
+        "expected": "portfolio"
+      },
+      {
+        "query": "Compare them",
+        "context": "Show me Tesla and Microsoft",
+        "predicted": "market",
+        "expected": "portfolio"
+      }
+    ],
+    "entity_failures": [
+      {
+        "query": "Show me Apple\u2019s performance",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AAPL"
+        ]
+      },
+      {
+        "query": "Compare Tesla and Microsoft",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "TSLA",
+          "MSFT"
+        ]
+      },
+      {
+        "query": "How is it performing?",
+        "context": "Show me Tesla",
+        "predicted": [],
+        "expected": [
+          "TSLA"
+        ]
+      },
+      {
+        "query": "Compare them",
+        "context": "Show me Tesla and Microsoft",
+        "predicted": [],
+        "expected": [
+          "TSLA",
+          "MSFT"
+        ]
+      },
+      {
+        "query": "Add Amazon to my portfolio",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AMZN"
+        ]
+      },
+      {
+        "query": "Remove Tesla from my portfolio",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "TSLA"
+        ]
+      },
+      {
+        "query": "Show me my gains in Apple and Amazon",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AAPL",
+          "AMZN"
+        ]
+      },
+      {
+        "query": "Check Microsoft and Google in my portfolio",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "MSFT",
+          "GOOG"
+        ]
+      },
+      {
+        "query": "Latest news on Tesla",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "TSLA"
+        ]
+      },
+      {
+        "query": "Tell me about Google",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "GOOG"
+        ]
+      },
+      {
+        "query": "What\u2019s happening with Amazon lately?",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AMZN"
+        ]
+      },
+      {
+        "query": "How is Apple performing in the market?",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AAPL"
+        ]
+      },
+      {
+        "query": "Does Apple's earnings affect my portfolio?",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "AAPL"
+        ]
+      },
+      {
+        "query": "Will Tesla\u2019s price drop impact my portfolio?",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "TSLA"
+        ]
+      },
+      {
+        "query": "Will news about Microsoft and Google change my returns?",
+        "context": null,
+        "predicted": [],
+        "expected": [
+          "MSFT",
+          "GOOG"
+        ]
+      }
+    ]
+  }
+}

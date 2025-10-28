@@ -1,0 +1,134 @@
+{
+  "results": [
+    {
+      "query": "What are my holdings?",
+      "expected_result": "pass",
+      "actual_result": "pass",
+      "expected_failed_agent": null,
+      "actual_failed_agent": null,
+      "reason": null,
+      "pass": true
+    },
+    {
+      "query": "Compare Tesla and Microsoft",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PlannerAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as portfolio instead of market",
+      "pass": true
+    },
+    {
+      "query": "Show me Amazon's performance",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PortfolioAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as portfolio instead of market. The query 'Show me Amazon's performance' refers to market performance, not portfolio holdings.",
+      "pass": true
+    },
+    {
+      "query": "What's the market sentiment today?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Did not plan any function calls to fetch market sentiment data, which is required for the query.",
+      "pass": true
+    },
+    {
+      "query": "How are they performing?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Extracted entities (TSLA, MSFT) not present or inferable from the original query 'How are they performing?'",
+      "pass": true
+    },
+    {
+      "query": "How is Tesla performing?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "QueryClassificationAgent",
+      "actual_failed_agent": "QueryClassificationAgent",
+      "reason": "Misclassified intent as 'unknown' instead of 'market'.",
+      "pass": true
+    },
+    {
+      "query": "Show my portfolio allocation by sector",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "ResponseGeneratorAgent",
+      "actual_failed_agent": "PortfolioAgent",
+      "reason": "Output is incomplete and irrelevant for 'portfolio allocation by sector'. It identifies a sector but provides no allocation data (e.g., percentage or value).",
+      "pass": true
+    },
+    {
+      "query": "Does Apple's earnings affect my portfolio?",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Incomplete plan for a hybrid query; missing a function call to fetch market earnings data for Apple.",
+      "pass": true
+    },
+    {
+      "query": "What happened to Apple in the news?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "MarketAgent",
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Did not plan any function calls despite a valid market intent and entity.",
+      "pass": true
+    },
+    {
+      "query": "Tell me my portfolio value",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "PlannerAgent",
+      "actual_failed_agent": "PortfolioAgent",
+      "reason": "PortfolioAgent returned only status 'success' but no actual structured portfolio data (holdings).",
+      "pass": true
+    },
+    {
+      "query": "How is it performing?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "QueryClassificationAgent",
+      "actual_failed_agent": "PortfolioAgent",
+      "reason": "PortfolioAgent's output '{\"status\": \"success\"}' is not the structured portfolio data (e.g., returns) it is expected to fetch, effectively making its output irrelevant or empty for subsequent steps that would require the actual data.",
+      "pass": true
+    },
+    {
+      "query": "What\u2019s happening with Apple and my portfolio?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "MarketAgent",
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "Incomplete plan for a hybrid query; did not plan to fetch market data for 'Apple'.",
+      "pass": true
+    },
+    {
+      "query": "How is Tesla performing?",
+      "expected_result": "fail",
+      "actual_result": "fail",
+      "expected_failed_agent": "ResponseGeneratorAgent",
+      "actual_failed_agent": "PortfolioAgent",
+      "reason": "Empty or irrelevant output; no returns data was provided despite the 'get_returns' function call.",
+      "pass": true
+    },
+    {
+      "query": "Show me market overview",
+      "expected_result": "pass",
+      "actual_result": "fail",
+      "expected_failed_agent": null,
+      "actual_failed_agent": "PlannerAgent",
+      "reason": "PlannerAgent failed to plan any function calls despite the query intent being 'market'.",
+      "pass": true
+    }
+  ],
+  "metrics": {
+    "total_cases": 14,
+    "accuracy": 100.0
+  }
+}
