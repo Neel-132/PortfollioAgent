@@ -68,22 +68,23 @@ def process_portfolio_query(execution_plan: Dict, session: Dict, client_id: str)
         results = returns
 
 
-    else:    # 🧠 Step 1: Extract tickers once
+    else:    # Step 1: Extract tickers once
         tickers = extract_tickers_from_fn_calls(fn_calls)
         logger.debug(f"Extracted tickers from fn_calls: {tickers}")
 
-        # 🪙 Step 2: Fetch latest prices (only once)
+        # Step 2: Fetch latest prices (only once)
         if len(tickers) == 0:
             logger.info(f"No tickers found from query. Getting the latest price of all the tickers for client {client_id}")
             tickers = portfolio_df["symbol"].unique().tolist()
         price_cache = fetch_latest_prices(tickers)
         logger.info(f"Fetched latest prices for {len(price_cache)} symbols")
 
-        # 🧮 Step 3: Initialize PortfolioFunctions
+        # Step 3: Initialize PortfolioFunctions
         portfolio_functions = PortfolioFunctions(portfolio_df, price_cache)
 
-        # 🧭 Step 4: Execute each function sequentially
+        # Step 4: Execute each function sequentially
         results = {}
+        output_list = []
         for call in fn_calls:
             fn_name = call.get("name")
             args = call.get("arguments", {})
@@ -95,8 +96,14 @@ def process_portfolio_query(execution_plan: Dict, session: Dict, client_id: str)
                 continue
 
             try:
-                logger.info(f"▶ Executing {fn_name} with args: {args}")
+                logger.info(f"Executing {fn_name} with args: {args}")
                 result = fn(**args)
+                # if fn_name not in results:
+                #     results[fn_name] = [result]
+                # else:
+                #     existing_results = results[fn_name]
+                #     existing_results.append(result)
+
                 results[fn_name] = result
             except Exception as e:
                 logger.exception(f"💥 Error executing {fn_name}")

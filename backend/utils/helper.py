@@ -452,6 +452,8 @@ def normalize_portfolio_output(raw_data):
         response["type"] = "unknown"
         response["data"] = raw_data
         return response
+    
+        
 
     except Exception as e:
         response["type"] = "error"

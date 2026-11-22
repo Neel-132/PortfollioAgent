@@ -94,7 +94,6 @@ def portfolio_snapshot(portfolio_data):
         st.sidebar.write("No portfolio data loaded.")
         return
     results = portfolio_data.get("results", [])
-    breakpoint()
     normalized = normalize_portfolio_output(results)
     data_type = normalized["type"]
     data = normalized["data"]
